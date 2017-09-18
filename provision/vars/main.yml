@@ -1,0 +1,8 @@
+---
+aws:
+  aws_profile: default
+  aws_access_key_id: "AKIAIFSDCVPSZTAOPHRQ"
+  aws_secret_access_key: "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"
+  region: eu-east-2
+  format: json
+  aws_system_user: vagrant
