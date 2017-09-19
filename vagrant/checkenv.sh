@@ -28,6 +28,7 @@ function py_checker { #checks if python 2.7.* is installed, if not - tries to in
                     echo
                     echo "Python is installed"
                     echo
+                    sleep 2
                     break
              fi
         done
@@ -60,6 +61,7 @@ function pip_checker { #checks if pip 1.* is installed, if not - tries to instal
                         cd /tmp
                         sudo wget https://bootstrap.pypa.io/get-pip.py
                         sudo python ./get-pip.py
+                        sleep 5
                         sudo apt-get install python-pip -y
                     else
                         yum install python-pip -y
@@ -68,6 +70,7 @@ function pip_checker { #checks if pip 1.* is installed, if not - tries to instal
                     echo
                     echo "Pip is installed"
                     echo
+                    sleep 2
                     break
              fi
         done
@@ -90,16 +93,47 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
                     echo
                     sleep 2
                     sudo pip install ansible
+                    sudo mkdir /etc/ansible
+                    sudo cp /home/vagrant/demo1/provision/hosts /etc/ansible/hosts
                     sudo pip install boto
+                    sudo pip install boto3
                 else
                     echo
                     echo "Ansible and needed packages installed"
                     echo
                     cat private_key > /home/vagrant/.ssh/id_rsa
                     chmod 600 /home/vagrant/.ssh/id_rsa
+                    sleep 2
                     break
              fi
         done
 }
 
 ansible_checker
+
+echo "---Installing Postgres-client:---"
+sleep 2
+function postgres_checker { #checks if Ansible is installed, if not - tries to install it 1 time
+    for i in `seq 2`;
+        do
+            if [[ $(which psql 2>&1) != *"/usr/bin/psql"* ]];
+                then
+                    echo
+                    echo "Postgres-client is not installed"
+                    echo
+                    sleep 2
+                    echo "Installing Postgres-client:"
+                    echo
+                    sleep 2
+                    sudo apt-get install postgresql-client -y
+                else
+                    echo
+                    echo "Postgres-client installed"
+                    echo
+                    sleep 2
+                    break
+             fi
+        done
+}
+
+postgres_checker

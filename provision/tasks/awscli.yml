@@ -23,11 +23,11 @@
 
 - name: Configure AWS.
   shell: aws configure set {{ item.key }} {{ item.value }} --profile {{ aws['aws_profile'] }}
-  no_log: True
+  no_log: False
   with_dict:
     aws_access_key_id: "{{ aws.aws_access_key_id }}"
     aws_secret_access_key: "{{ aws.aws_secret_access_key }}"
     region: "{{ aws.region }}"
     format: "{{ aws.format }}"
-  become_user: "{{ aws.aws_user }}"
+  become: true
   changed_when: false

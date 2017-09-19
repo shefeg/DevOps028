@@ -1,47 +1,58 @@
 ---
-#- name: Create Postgres db on RDS
-#  local_action:
-#    module: rds
-#    command: create
-#    instance_name: "{{ rds.rds_instance_name }}"
-#    db_engine: "{{ rds.db_engine }}"
-#    size: "{{ rds.size }}"
-#    instance_type: "{{ rds.instance_type }}"
-#    db_name: "{{ rds.db_name }}"
-#    username: "{{ rds.username }}"
-#    password: "{{ rds.password }}"
-#    region: "{{ rds.region }}"
-#    subnet: "{{ rds.subnet }}"
-#    vpc_security_groups: "{{ rds.vpc_security_groups }}"
-#    multi_zone: no
-#    port: 5432
-#    wait: yes
-#    wait_timeout: 3600
-#  register: rds
-#
-#- name: Get RDS instance facts
-#  local_action:
-#    module: rds
-#    command: facts
-#    instance_name: "{{ rds.rds_instance_name }}"
-#    region: "{{ aws.region }}"
-#  when: rds|succeeded
+ - name: Create RDS with Postgres DB.
+   local_action:
+     module: rds
+     command: create
+     instance_name: "{{ rds.rds_instance_name }}"
+     db_engine: "{{ rds.db_engine }}"
+     size: "{{ rds.size }}"
+     instance_type: "{{ rds.instance_type }}"
+     db_name: "{{ rds.db_name }}"
+     username: "{{ rds.username }}"
+     password: "{{ rds.password }}"
+     region: "{{ rds.region }}"
+     multi_zone: no
+     port: 5432
+     wait: yes
+     wait_timeout: 3600
+   register: rds_state
 
- - name: Set RDS parameters to environment variable
-#  debug: msg= "RDS endpoint is --> {{ rds.instance.endpoint }}"
-   #shell: echo DB_HOST is $DB_HOST
-   shell: export DB_NAME="{{ rds.db_name }}"
-#   shell: echo DB_USER is $DB_USER
-#   shell: echo DB_PASS is $DB_PASS
+ - name: Get RDS instance facts.
+   local_action:
+     module: rds
+     command: facts
+     instance_name: "{{ rds.rds_instance_name }}"
+     region: "{{ aws.region }}"
+   when: rds_state|succeeded
 
-   environment:
-#    DB_HOST: "{{ rds.instance.endpoint }}"
-     DB_NAME: "{{ rds.db_name }}"
-#     DB_USER: "{{ rds.username }}"
-#     DB_PASS: "{{ rds.password }}"
-   register: shellout
+ - name: Get RDS endpoint.
+   debug:
+     msg: "RDS endpoint is --> {{ rds_state.instance.endpoint }}"
+
+ - name: Setting environment variables.
+   blockinfile:
+     dest: /root/.bashrc
+     insertafter: "EOF"
+     block: |
+       export DB_HOST={{ rds_state.instance.endpoint }}
+       export DB_NAME={{ rds.db_name }}
+       export DB_USER={{ rds.username }}
+       export DB_PASS={{ rds.password }}
+     state: present
+
+ - name: Exporting environment variables.
+   shell: . /root/.bashrc && echo {{ item }}
+   args:
+     executable: /bin/bash
+   register: myvar
    become: true
-#  debug: var=shellout
+   with_items:
+     - $DB_HOST
+     - $DB_NAME
+     - $DB_USER
+     - $DB_PASSWORD
+
+ - debug: var=myvar.stdout
 
 
 

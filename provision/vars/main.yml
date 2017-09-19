@@ -1,16 +1,16 @@
 ---
 aws:
   aws_profile: default
-  aws_access_key_id:
-  aws_secret_access_key:
+  aws_access_key_id: "-"
+  aws_secret_access_key: "-"
   region: us-east-1
   format: json
   aws_user: vagrant
   bucket: aidemo1
 
 env:
-  project_dir: /home/{{ aws['aws_user'] }}/demo1
-  liquibase_dir: home/{{ aws['aws_user'] }}/demo1/liquibase
+  project_dir: /home/{{ aws.aws_user }}/demo1
+  liquibase_dir: /home/{{ aws.aws_user }}/demo1/liquibase
 
 rds:
  rds_instance_name: aidemo
@@ -21,7 +21,5 @@ rds:
  username: aura
  password: mysecretpassword
  region: us-east-1
- subnet: default-vpc-37ed5753
- vpc_security_groups: sg-97c457f1
  backup_retention: 0
 
