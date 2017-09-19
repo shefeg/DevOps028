@@ -3,7 +3,7 @@
    s3:
     bucket: "{{aws.bucket}}"
     object: oracle-java8-jdk_8u144_amd64.deb
-    dest: "{{ env.project_dir }}/"
+    dest: "{{ env.project_dir }}/oracle-java8-jdk_8u144_amd64.deb"
     mode: get
     ignore_nonexistent_bucket: true
 
@@ -11,7 +11,7 @@
    s3:
     bucket: "{{aws.bucket}}"
     object: Samsara-1.3.5.RELEASE.jar
-    dest: "{{ env.project_dir }}/"
+    dest: "{{ env.project_dir }}/Samsara-1.3.5.RELEASE.jar"
     mode: get
     ignore_nonexistent_bucket: true
 
@@ -19,7 +19,7 @@
    s3:
     bucket: "{{aws.bucket}}"
     object: liquibase-3.5.3-bin.tar.gz
-    dest: "{{ env.liquibase_dir }}/"
+    dest: "{{ env.liquibase_dir }}/liquibase-3.5.3-bin.tar.gz"
     mode: get
     ignore_nonexistent_bucket: true
 
@@ -27,6 +27,6 @@
    s3:
     bucket: "{{aws.bucket}}"
     object: postgresql-42.1.4.jar
-    dest: "{{ env.liquibase_dir }}/"
+    dest: "{{ env.liquibase_dir }}/postgresql-42.1.4.jar"
     mode: get
     ignore_nonexistent_bucket: true

@@ -2,7 +2,7 @@
 aws:
   aws_profile: default
   aws_access_key_id:
-  aws_secret_access_key: 
+  aws_secret_access_key:
   region: us-east-1
   format: json
   aws_user: vagrant
@@ -24,5 +24,4 @@ rds:
  subnet: default-vpc-37ed5753
  vpc_security_groups: sg-97c457f1
  backup_retention: 0
- wait: yes
- wait_timeout: 600
+
