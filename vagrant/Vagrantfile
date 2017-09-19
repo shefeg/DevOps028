@@ -83,8 +83,29 @@ Vagrant.configure("2") do |config|
 			end
 
 		config.vm.provision "shell", inline: <<-SHELL
-            sudo apt-get update
-            sudo apt-get upgrade
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
+        SHELL
+
+        config.vm.provision "shell", path: "checkenv.sh"
+
+        end
+
+
+     config.vm.define "ubuntu16" do |config|
+		config.vm.box = "bento/ubuntu-16.04"
+		config.vm.network "public_network", bridge: "Realtek PCIe GBE Family Controller"
+		config.vm.network "forwarded_port", guest: 9000, host: 9000
+		config.vm.synced_folder "../", "/home/vagrant/demo1/"
+		config.vm.provider "virtualbox" do |vb|
+			vb.gui = true
+			vb.memory = "2048"
+			vb.cpus = 1
+			end
+
+		config.vm.provision "shell", inline: <<-SHELL
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
         SHELL
 
         config.vm.provision "shell", path: "checkenv.sh"

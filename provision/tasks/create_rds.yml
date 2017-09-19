@@ -1,0 +1,18 @@
+---
+- name: Create Postgres db on RDS
+  local_action:
+    module: rds
+    command: create
+    instance_name: "{{ rds['rds_instance_name'] }}"
+    db_engine: "{{ rds['db_engine'] }}"
+    size: "{{ rds['size'] }}"
+    instance_type: "{{ rds['instance_type'] }}"
+    db_name: "{{ rds['db_name'] }}"
+    username: "{{ rds['username'] }}"
+    password: "{{ rds['password'] }}"
+    region: "{{ rds['region'] }}"
+    subnet: "{{ rds['subnet'] }}"
+    vpc_security_groups: "{{ rds['vpc_security_groups'] }}"
+    multi_zone: no
+    port: 5432
+

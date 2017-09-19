@@ -3,6 +3,24 @@ aws:
   aws_profile: default
   aws_access_key_id: "AKIAIFSDCVPSZTAOPHRQ"
   aws_secret_access_key: "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"
-  region: eu-east-2
+  region: us-east-1
   format: json
-  aws_system_user: vagrant
+  aws_user: vagrant
+  bucket: aidemo1
+
+env:
+  project_dir: /home/{{ aws['aws_user'] }}/demo1
+  liquibase_dir: home/{{ aws['aws_user'] }}/demo1/liquibase
+
+rds:
+ rds_instance_name: aidemo
+ db_engine: postgres
+ size: 5
+ instance_type: db.t2.micro
+ db_name: auradb
+ username: aura
+ password: mysecretpassword
+ region: us-east-1
+ subnet: default-vpc-37ed5753
+ vpc_security_groups: sg-97c457f1
+ backup_retention: 0

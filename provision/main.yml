@@ -5,3 +5,6 @@
     - vars/main.yml
   tasks:
     - include: tasks/awscli.yml
+               tasks/javainstall.yml
+               #tasks/create_rds.yml
+               tasks/getfroms3.yml

@@ -31,9 +31,6 @@ function py_checker { #checks if python 2.7.* is installed, if not - tries to in
                     break
              fi
         done
-    echo
-    echo "Python installation failed, check error messages" 1>&2
-    exit 1
 }
 
 py_checker
@@ -50,7 +47,7 @@ fi
 function pip_checker { #checks if pip 1.* is installed, if not - tries to install it 2 times
     for i in `seq 2`;
         do
-            if [[ $(pip --version 2>&1) != *"pip 1."* ]];
+            if [[ $(pip --version 2>&1) != */usr/local/lib/python* ]];
                 then
                     echo
                     echo "Pip is not installed"
@@ -63,7 +60,7 @@ function pip_checker { #checks if pip 1.* is installed, if not - tries to instal
                         cd /tmp
                         sudo wget https://bootstrap.pypa.io/get-pip.py
                         sudo python ./get-pip.py
-                        sudo apt-get install python-pip
+                        sudo apt-get install python-pip -y
                     else
                         yum install python-pip -y
                     fi
@@ -74,9 +71,6 @@ function pip_checker { #checks if pip 1.* is installed, if not - tries to instal
                     break
              fi
         done
-     echo
-     echo "Pip installation failed, check error messages" 1>&2
-     exit 1
 }
 
 pip_checker
@@ -92,22 +86,20 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
                     echo "Ansible is not installed"
                     echo
                     sleep 2
-                    echo "Installing Ansible:"
+                    echo "Installing Ansible and needed packages:"
                     echo
                     sleep 2
                     sudo pip install ansible
+                    sudo pip install boto
                 else
                     echo
-                    echo "Ansible is installed"
+                    echo "Ansible and needed packages installed"
                     echo
                     cat private_key > /home/vagrant/.ssh/id_rsa
                     chmod 600 /home/vagrant/.ssh/id_rsa
                     break
              fi
         done
-     echo
-     echo "Ansible installation failed, check error messages" 1>&2
-     exit 1
 }
 
 ansible_checker

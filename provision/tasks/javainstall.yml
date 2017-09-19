@@ -1,0 +1,19 @@
+---
+- name: Check if predefined Java package is installed
+  command: dpkg-query -l oracle-java8-jdk_8u144_amd64.deb
+  register: dpkg_check
+  ignore_errors: True
+  become: true
+
+- name: Install Java package
+  command: dpkg -i {{env.project_dir}}/oracle-java8-jdk_8u144_amd64.deb
+  when: dpkg_check.rc == 1
+  register: java_inst_result
+  become: true
+
+- name: Update Java alternatives
+  command: update-alternatives --set java /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
+  when: java_inst_result.rc == 0
+  become: true
+
+
