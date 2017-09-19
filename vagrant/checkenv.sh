@@ -11,7 +11,7 @@ sleep 2
 function py_checker { #checks if python 2.7.* is installed, if not - tries to install it 2 times
     for i in `seq 2`;
         do
-            if [[ $(python -V 2>&1) == *"Python 2.7"* ]];
+            if [[ $(python -V 2>&1) != *"Python 2.7"* ]];
                 then
                     echo
                     echo "Python is not installed"
@@ -47,7 +47,7 @@ fi
 function pip_checker { #checks if pip 1.* is installed, if not - tries to install it 2 times
     for i in `seq 2`;
         do
-            if [[ $(pip --version 2>&1) != */usr/local/lib/python* ]];
+            if [[ $(pip --version 2>&1) != "*dist-packages*" ]];
                 then
                     echo
                     echo "Pip is not installed"
@@ -80,7 +80,7 @@ sleep 2
 function ansible_checker { #checks if Ansible is installed, if not - tries to install it 1 time
     for i in `seq 2`;
         do
-            if [[ $(ansible --version 2>&1) != *"Ansible 2."* ]];
+            if [[ $(ansible --version 2>&1) != *"dist-packages/ansible"* ]];
                 then
                     echo
                     echo "Ansible is not installed"
