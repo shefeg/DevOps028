@@ -1,0 +1,19 @@
+---
+
+ - name: Start Java application.
+   shell: "java -jar {{ env.project_dir }}/Samsara-1.3.5.RELEASE.jar"
+   args:
+     executable: /bin/bash
+   environment:
+     DB_HOST: "{{ rds_state.instance.endpoint }}"
+     DB_NAME: "{{ rds.db_name }}"
+     DB_USER: "{{ rds.username }}"
+     DB_PASS: "{{ rds.password }}"
+   register: app_state
+   become: true
+
+
+# - name: Check that you can connect (GET) to a page and it returns a status 200.
+#   uri:
+#     url: http://localhost:9000
+#   when: app_state|succeeded

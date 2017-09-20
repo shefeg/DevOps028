@@ -4,7 +4,8 @@
   vars_files:
     - vars/main.yml
   tasks:
-#    - include_tasks: tasks/awscli.yml
-#    - include_tasks: tasks/getfroms3.yml
-#    - include_tasks: tasks/javainstall.yml
-    - include_tasks: tasks/create_rds.yml
+    - include_tasks: tasks/awscli.yml
+    - include_tasks: tasks/getfroms3.yml
+    - include_tasks: tasks/javainstall.yml
+    - include_tasks: tasks/create_rds_and_start_app.yml
+
