@@ -144,4 +144,4 @@ echo
 echo "---Running Ansible script:---"
 sleep 2
 cd /home/vagrant/demo1/provision/
-ansible-playbook main.yml -vvv
+ansible-playbook main.yml
