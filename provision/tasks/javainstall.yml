@@ -8,7 +8,7 @@
   command: dpkg -i {{env.project_dir}}/oracle-java8-jdk_8u144_amd64.deb
   when: dpkg_check.rc == 1
   register: java_state
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Install required packages for Java.
   command: apt-get -f install -y
