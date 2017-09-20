@@ -5,6 +5,7 @@ function os_type { #checks which installation commands to use depending on debia
     which apt-get && { echo debian; return; }
 }
 
+echo
 echo "---Checking configuration of Python environment:---"
 sleep 2
 
@@ -36,6 +37,7 @@ function py_checker { #checks if python 2.7.* is installed, if not - tries to in
 
 py_checker
 
+echo
 echo "---Installing build pre-requisites for Ansible:---"
 sleep 2
 if [[ $(os_type) == *"debian"* ]];
@@ -48,7 +50,7 @@ fi
 function pip_checker { #checks if pip 1.* is installed, if not - tries to install it 2 times
     for i in `seq 2`;
         do
-            if [[ $(pip --version 2>&1) != "*dist-packages*" ]];
+            if [[ $(pip --version 2>&1) != *"/usr/local/lib/python"* ]];
                 then
                     echo
                     echo "Pip is not installed"
@@ -61,8 +63,6 @@ function pip_checker { #checks if pip 1.* is installed, if not - tries to instal
                         cd /tmp
                         sudo wget https://bootstrap.pypa.io/get-pip.py
                         sudo python ./get-pip.py
-                        sleep 5
-                        sudo apt-get install python-pip -y
                     else
                         yum install python-pip -y
                     fi
@@ -78,6 +78,7 @@ function pip_checker { #checks if pip 1.* is installed, if not - tries to instal
 
 pip_checker
 
+echo
 echo "---Installing Ansible:---"
 sleep 2
 function ansible_checker { #checks if Ansible is installed, if not - tries to install it 1 time
@@ -111,6 +112,7 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
 
 ansible_checker
 
+echo
 echo "---Installing Postgres-client:---"
 sleep 2
 function postgres_checker { #checks if Ansible is installed, if not - tries to install it 1 time
@@ -137,3 +139,9 @@ function postgres_checker { #checks if Ansible is installed, if not - tries to i
 }
 
 postgres_checker
+
+echo
+echo "---Running Ansible script:---"
+sleep 2
+cd /home/vagrant/demo1/provision/
+ansible-playbook main.yml -vvv
