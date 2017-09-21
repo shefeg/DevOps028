@@ -11,6 +11,7 @@
      port: 9000
      host: localhost
      delay: 60
+     timeout: 200
    when: app_state|succeeded
    register: app_up
 
