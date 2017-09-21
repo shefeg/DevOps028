@@ -23,3 +23,7 @@ rds:
  region: us-east-1
  backup_retention: 0
 
+rds_state:
+ instance:
+  endpoint: ""
+
