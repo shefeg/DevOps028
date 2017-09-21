@@ -3,9 +3,15 @@
   become: true
   vars_files:
     - vars/main.yml
+#  environment:
+#    DB_HOST: ""
+#    DB_NAME: "{{ rds.db_name }}"
+#    DB_USER: "{{ rds.username }}"
+#    DB_PASS: "{{ rds.password }}"
   tasks:
-    - include_tasks: tasks/awscli.yml
-    - include_tasks: tasks/getfroms3.yml
-    - include_tasks: tasks/javainstall.yml
-    - include_tasks: tasks/create_rds_and_start_app.yml
+    - include: tasks/awscli.yml
+    - include: tasks/getfroms3.yml
+    - include: tasks/javainstall.yml
+    - include: tasks/create_rds_and_start_app.yml
+#    - include: tasks/run_app.yml
 

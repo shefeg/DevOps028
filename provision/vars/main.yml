@@ -13,7 +13,7 @@ env:
   liquibase_dir: /home/{{ aws.aws_user }}/demo1/liquibase
 
 rds:
- rds_instance_name: aidemo
+ rds_instance_name: aidemo1
  db_engine: postgres
  size: 5
  instance_type: db.t2.micro

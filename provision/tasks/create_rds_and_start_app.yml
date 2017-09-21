@@ -43,6 +43,7 @@
    debug:
      msg: "RDS endpoint is --> {{ rds_state.instance.endpoint }}"
 
+
  - name: Setting environment variables.
    blockinfile:
      path: /root/.bashrc
@@ -53,6 +54,8 @@
        export DB_USER={{ rds.username }}
        export DB_PASS={{ rds.password }}
      state: present
+#   environment:
+#     DB_HOST: "{{ rds_state.instance.endpoint }}"
 
  - name: Exporting environment variables.
    shell: . /root/.bashrc && echo {{ item }}
@@ -109,3 +112,9 @@
      host: localhost
      delay: 60
    when: app_state|succeeded
+   register: app_up
+
+ - name: Check that you can connect (GET) to a page and it returns a status 200.
+   uri:
+     url: http://localhost:9000/login
+   when: app_up|succeeded
