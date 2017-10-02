@@ -33,14 +33,11 @@ pipeline {
                 sh "mvn package -B ${params.MAVEN_OPTS}"
             }
         }
-        stage('Deploy') {
+        stage('Archive') {
             steps {
-                parallel(deploy: {
-                    sh 'docker build -t samsara .'
-                },
                 archive: {
                     archive 'target/*.jar'
-                })
+                }
             }
         }
     }
