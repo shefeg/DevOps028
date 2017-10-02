@@ -2,12 +2,10 @@
 
 pipeline {
 
-    agent {
-        label 'agent-node-label'
-    }
+    agent any
 
     tools {
-        maven "Maven 3.5.0"
+        maven "Maven 3.3.9"
       }
 
     parameters {
@@ -35,10 +33,8 @@ pipeline {
         }
         stage('Archive') {
             steps {
-                archive: {
-                    archive 'target/*.jar'
-                }
-            }
-        }
-    }
+                archive 'target/*.jar'
+             }
+         }
+     }
 }
