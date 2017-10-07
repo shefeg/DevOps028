@@ -1,7 +1,7 @@
 pipeline {
 
     agent {
-        label 'slave_1'
+        label 'slave_2'
 
     }
 
@@ -11,6 +11,8 @@ pipeline {
 
     parameters {
         string(name: 'MAVEN_OPTS', defaultValue: '-Djava.awt.headless=true', description: 'Options for Maven')
+        string(name: 'REGION', defaultValue: 'us-east-1')
+        string(name: 'INSTANCE_NAME', defaultValue: 'aidemo2')
     }
 
     stages {
@@ -36,6 +38,16 @@ pipeline {
 			steps {
 			    archive 'target/*.jar'
 			}
+		}
+		stage('Populate S3 bucket') {
+			steps {
+				sh "/usr/bin/aws s3api create-bucket --bucket ${params.INSTANCE_NAME} --region ${params.REGION}"
+				sh "wget https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3.5.3/liquibase-3.5.3-bin.tar.gz"
+				sh "wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar"
+				sh "/usr/bin/aws s3 cp target/Samsara-1.3.5.RELEASE.jar	s3://${params.INSTANCE_NAME}/Samsara-1.3.5.RELEASE.jar"
+				sh "/usr/bin/aws s3 cp liquibase-3.5.3-bin.tar.gz	s3://${params.INSTANCE_NAME}/liquibase-3.5.3-bin.tar.gz"
+				sh "/usr/bin/aws s3 cp postgresql-42.1.4.jar s3://${params.INSTANCE_NAME}/postgresql-42.1.4.jar"
+            }
 		}
 	}
 }
