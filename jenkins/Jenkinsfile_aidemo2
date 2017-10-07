@@ -1,0 +1,36 @@
+pipeline {
+    agent { label 'master' }
+    stages {
+        stage('Prepare Environment and Build Application') {
+            steps {
+                parallel (
+                    prepare_environment: {
+                        build job: 'prepare_environment',
+                        parameters: [
+                            string(name: 'INSTANCE_NAME', value: 'aidemo2'),
+                            string(name: 'RDS_DB_ENGINE', value: 'postgres'),
+                            string(name: 'RDS_SIZE', value: '5'),
+                            string(name: 'RDS_INSTANCE_TYPE', value: 'db.t2.micro'),
+                            string(name: 'AVAILABILITY_ZONE', value: 'us-east-1d'),
+                            string(name: 'REGION', value: 'us-east-1'),
+                            string(name: 'RDS_BACKUP_RETENTION', value: '0'),
+                            string(name: 'DB_NAME', value: 'auradb'),
+                            string(name: 'DB_USER', value: 'aura'),
+                            string(name: 'EC2_AMI', value: 'ami-c425e5be'),
+                            string(name: 'EC2_INSTANCE_TYPE', value: 't2.micro'),
+                            string(name: 'SSH_KEYS', value: 'aipk'),
+                            string(name: 'SECURITY_GROUP', value: 'ec2'),
+                            credentials(description: '', name: 'DB_PASSWORD', value: 'e8529fe4-5ffe-4fe4-89c0-98119c9f3b11')
+                        ]
+                    },
+                    build_application: {
+                        build job: 'build_application',
+                        parameters: [
+                            string(name: 'MAVEN_OPTS', value: '-Djava.awt.headless=true')
+                        ]
+                    }
+                )
+            }
+        }
+    }
+}
