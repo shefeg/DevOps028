@@ -115,5 +115,5 @@ ansible_checker
 echo
 echo "---Running Ansible script:---"
 sleep 2
-cd $WORKSPACE/provision
+cd /home/vagrant/demo1/provision
 ansible-playbook main.yml

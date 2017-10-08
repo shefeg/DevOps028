@@ -18,7 +18,11 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/shefeg/DevOps028.git'
+                checkout(
+                    [$class: 'GitSCM',
+                    branches: [[name: '*/jenkins']], doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout']], submoduleCfg: [],
+                    userRemoteConfigs: [[url: 'https://github.com/shefeg/DevOps028.git']]])
             }
         }
 		stage('Build') {
