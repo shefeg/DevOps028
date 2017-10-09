@@ -109,9 +109,3 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
 }
 
 ansible_checker
-
-echo
-echo "---Running Ansible script:---"
-sleep 2
-cd /home/ubuntu/DevOps028/provision
-ansible-playbook main.yml
