@@ -1,9 +1,7 @@
-pipeline {
+    
 
-    agent {
-	    label 'slave_1'
-	}
-
+node ('slave_1') {
+        
     parameters {
         string(name: 'INSTANCE_NAME', defaultValue: 'aidemo2')
         string(name: 'RDS_DB_ENGINE', defaultValue: 'postgres')
@@ -13,30 +11,16 @@ pipeline {
         string(name: 'RDS_BACKUP_RETENTION', defaultValue: '0')
         string(name: 'DB_NAME', defaultValue: 'auradb')
         string(name: 'DB_USER', defaultValue: 'aura')
-        string(name: 'EC2_AMI', defaultValue: 'ami-c425e5be')
-		string(name: 'EC2_INSTANCE_TYPE', defaultValue: 't2.micro')
-		string(name: 'SSH_KEYS', defaultValue: 'aipk')
-		string(name: 'SECURITY_GROUP', defaultValue: 'ec2')
+        string(name: 'DB_PASSWORD', defaultValue: 'mysecretpassword')
     }
-
-    stages {
-        stage('Prepare Environment') {
-			parallel {
-				stage('Create RDS') {
-					steps {
-						sh "/usr/bin/aws rds create-db-instance --db-instance-identifier ${params.INSTANCE_NAME} --engine ${params.RDS_DB_ENGINE} --allocated-storage ${params.RDS_SIZE} --db-instance-class ${params.RDS_INSTANCE_TYPE} --db-name ${params.DB_NAME} --master-username ${params.DB_USER} --master-user-password ${DB_PASSWORD} --availability-zone ${params.AVAILABILITY_ZONE} --backup-retention-period ${params.RDS_BACKUP_RETENTION}"
-						sh "while [[  `/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"available\" | grep \"DBInstanceStatus\" | cut -d':' -f2 | tr -d '\", '` != \"available\"  ]]; do sleep 10; done"
-						sh "echo DB_HOST=`/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"Address\" | cut -d':' -f2 | tr -d '\", '`"
-					}
-				}
-				stage('Create EC2') {
-					steps {
-						sh "/usr/bin/aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 > instance_info.txt"
-						sh "/usr/bin/aws ec2 create-tags --resources `grep \"InstanceId\" instance_info.txt | cut -d':' -f2 | tr -d '\", '` --tags Key=Name,Value=${params.INSTANCE_NAME}"
-						sh "while [[  `/usr/bin/aws ec2 describe-instances --filters \"Name=tag-value,Values=${params.INSTANCE_NAME}\" | grep \"16\" | grep \"Code\" | cut -d':' -f2 | tr -d '\", '` != \"16\"  ]]; do sleep 10; done"
-					}
-				}
-            }
-		}
+    stage('Create RDS') {
+		try {    
+		    sh "/usr/bin/aws rds create-db-instance --db-instance-identifier ${params.INSTANCE_NAME} --engine ${params.RDS_DB_ENGINE} --allocated-storage ${params.RDS_SIZE} --db-instance-class ${params.RDS_INSTANCE_TYPE} --db-name ${params.DB_NAME} --master-username ${params.DB_USER} --master-user-password ${params.DB_PASSWORD} --availability-zone ${params.AVAILABILITY_ZONE} --backup-retention-period ${params.RDS_BACKUP_RETENTION}"
+			sh "while [[  `/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"available\" | grep \"DBInstanceStatus\" | cut -d':' -f2 | tr -d '\", '` != \"available\"  ]]; do sleep 10; done"
+			sh "echo DB_HOST=`/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"Address\" | cut -d':' -f2 | tr -d '\", '`"
+		} catch (err) {
+		    echo "Caught: ${err}"
+            currentBuild.result = 'SUCCESS'
+          }
     }
 }
