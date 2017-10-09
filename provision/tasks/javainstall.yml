@@ -1,28 +1,20 @@
 ---
-- name: Check if predefined Java package is installed.
-  command: dpkg-query -l oracle-java8-jdk_8u144_amd64.deb
-  register: dpkg_check
-  ignore_errors: True
+- name: Install add-apt-repostory.
+  become: yes
+  apt: name=software-properties-common state=latest
 
-- name: Install Java package.
-  command: dpkg -i {{env.project_dir}}/oracle-java8-jdk_8u144_amd64.deb
-  when: dpkg_check.rc == 1
-  register: java_state
-  ignore_errors: true
+- name: Add Oracle Java Repository.
+  become: yes
+  apt_repository: repo='ppa:webupd8team/java'
 
-- name: Install required packages for Java.
-  command: apt-get -f install -y
-  when: java_state.rc == 1
-  register: java_state
+- name: Accept Java 8 License.
+  become: yes
+  debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
 
-- name: Install Java package again.
-  command: dpkg -i {{env.project_dir}}/oracle-java8-jdk_8u144_amd64.deb
-  when: dpkg_check.rc == 1
-  register: java_inst_result
-
-- name: Update Java alternatives.
-  command: update-alternatives --set java /usr/lib/jvm/jdk-8-oracle-x64/jre/bin/java
-  when: java_inst_result.rc == 0
-
-
-
+- name: Install Oracle Java 8.
+  become: yes
+  apt: name={{item}} state=latest
+  with_items:
+    - oracle-java8-installer
+    - ca-certificates
+    - oracle-java8-set-default

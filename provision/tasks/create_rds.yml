@@ -1,5 +1,5 @@
 ---
- - name: Check if RDS instance already created and get facts.
+ - name: Check if RDS instance created and get facts.
    local_action:
      module: rds
      command: facts
@@ -8,42 +8,42 @@
    register: rds_state
    ignore_errors: true
 
- - debug: msg="Successfully got facts from already created RDS instance"
+ - debug: msg="Successfully got facts from RDS instance"
    when: rds_state|succeeded
 
- - name: Create RDS with Postgres DB.
-   local_action:
-     module: rds
-     command: create
-     instance_name: "{{ rds.rds_instance_name }}"
-     db_engine: "{{ rds.db_engine }}"
-     size: "{{ rds.size }}"
-     instance_type: "{{ rds.instance_type }}"
-     db_name: "{{ rds.db_name }}"
-     username: "{{ rds.username }}"
-     password: "{{ rds.password }}"
-     region: "{{ rds.region }}"
-     multi_zone: no
-     port: 5432
-     wait: yes
-     wait_timeout: 3600
-   when: rds_state|failed
-   register: rds_state
-
- - name: Get RDS instance facts.
-   local_action:
-     module: rds
-     command: facts
-     instance_name: "{{ rds.rds_instance_name }}"
-     region: "{{ aws.region }}"
-   when: rds_state|succeeded
-   register: rds_state
-
- - name: Get RDS endpoint.
-   debug:
-     msg: "RDS endpoint is --> {{ rds_state.instance.endpoint }}"
-   environment:
-     DB_HOST: "{{ rds_state.instance.endpoint }}"
+# - name: Create RDS with Postgres DB.
+#   local_action:
+#     module: rds
+#     command: create
+#     instance_name: "{{ rds.rds_instance_name }}"
+#     db_engine: "{{ rds.db_engine }}"
+#     size: "{{ rds.size }}"
+#     instance_type: "{{ rds.instance_type }}"
+#     db_name: "{{ rds.db_name }}"
+#     username: "{{ rds.username }}"
+#     password: "{{ rds.password }}"
+#     region: "{{ rds.region }}"
+#     multi_zone: no
+#     port: 5432
+#     wait: yes
+#     wait_timeout: 3600
+#   when: rds_state|failed
+#   register: rds_state
+#
+# - name: Get RDS instance facts.
+#   local_action:
+#     module: rds
+#     command: facts
+#     instance_name: "{{ rds.rds_instance_name }}"
+#     region: "{{ aws.region }}"
+#   when: rds_state|succeeded
+#   register: rds_state
+#
+# - name: Get RDS endpoint.
+#   debug:
+#     msg: "RDS endpoint is --> {{ rds_state.instance.endpoint }}"
+#   environment:
+#     DB_HOST: "{{ rds_state.instance.endpoint }}"
 
 # - name: Setting environment variables.
 #   blockinfile:
