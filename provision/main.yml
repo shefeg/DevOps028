@@ -10,7 +10,7 @@
     DB_PASS: "{{ rds.password }}"
 
   tasks:
-    - include: tasks/awscli.yml
+#    - include: tasks/awscli.yml
     - include: tasks/getfroms3.yml
     - include: tasks/javainstall.yml
     - include: tasks/create_rds.yml

@@ -42,7 +42,7 @@ echo "---Installing build pre-requisites for Ansible:---"
 sleep 2
 if [[ $(os_type) == *"debian"* ]];
     then
-        sudo apt-get install build-essential libssl-dev libffi-dev python-dev -y
+        sudo apt-get install build-essential libssl-dev libffi-dev python-dev zip git -y
     else
         yum install build-essential libssl-dev libffi-dev python-dev -y
 fi
@@ -95,15 +95,13 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
                     sleep 2
                     sudo pip install ansible
                     sudo mkdir /etc/ansible
-                    sudo cp /home/vagrant/demo1/provision/hosts /etc/ansible/hosts
+                    sudo cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
                     sudo pip install boto
                     sudo pip install boto3
                 else
                     echo
                     echo "Ansible and needed packages installed"
                     echo
-                    cat private_key > /home/vagrant/.ssh/id_rsa
-                    chmod 600 /home/vagrant/.ssh/id_rsa
                     sleep 2
                     break
              fi
@@ -111,9 +109,3 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
 }
 
 ansible_checker
-
-echo
-echo "---Running Ansible script:---"
-sleep 2
-cd $WORKSPACE/provision
-ansible-playbook main.yml

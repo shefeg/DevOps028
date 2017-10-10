@@ -1,12 +1,12 @@
 ---
- - name: Get Java package.
-   aws_s3:
-    bucket: "{{aws.bucket}}"
-    object: oracle-java8-jdk_8u144_amd64.deb
-    dest: "{{env.project_dir}}/oracle-java8-jdk_8u144_amd64.deb"
-    mode: get
-    retries: 5
-    overwrite: different
+# - name: Get Java package.
+#   aws_s3:
+#    bucket: "{{aws.bucket}}"
+#    object: oracle-java8-jdk_8u144_amd64.deb
+#    dest: "{{env.project_dir}}/oracle-java8-jdk_8u144_amd64.deb"
+#    mode: get
+#    retries: 5
+#    overwrite: different
 
  - name: Get Samsara package.
    aws_s3:

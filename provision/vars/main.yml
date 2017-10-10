@@ -1,27 +1,27 @@
 ---
 aws:
   aws_profile: default
-  aws_access_key_id: "-"
-  aws_secret_access_key: "-"
+#  aws_access_key_id: "CHANGE_KEY"
+#  aws_secret_access_key: "CHANGE_SECRET"
   region: us-east-1
   format: json
-  aws_user: vagrant
-  bucket: aidemo1
+  aws_user: ubuntu
+  bucket: aidemo2
 
 env:
-  project_dir: /home/{{ aws.aws_user }}/demo1
-  liquibase_dir: /home/{{ aws.aws_user }}/demo1/liquibase
+  project_dir: /home/{{ aws.aws_user }}/DevOps028
+  liquibase_dir: /home/{{ aws.aws_user }}/DevOps028/liquibase
 
 rds:
- rds_instance_name: aidemo1
- db_engine: postgres
- size: 5
- instance_type: db.t2.micro
+ rds_instance_name: aidemo2
+# db_engine: postgres
+# size: 5
+# instance_type: db.t2.micro
  db_name: auradb
  username: aura
  password: mysecretpassword
- region: us-east-1
- backup_retention: 0
+# region: us-east-1
+# backup_retention: 0
 
 rds_state:
  instance:
