@@ -31,6 +31,12 @@ pipeline {
         }
         stage('Create EC2 and Build application') {
 			parallel {
+		        stage('Terminate old EC2 instances') {
+					steps {
+						sh "aws ec2 terminate-instances --instance-ids `aws ec2 describe-instances --filters \"Name=tag-value,Values=${params.INSTANCE_NAME}\" | grep \"InstanceId\" | cut -d':' -f2 | tr -d '\", '`"
+						echo "Old EC2 instances are getting terminated"
+					}
+				}
 		        stage('Create EC2') {
 					steps {
 						sh "aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 | tee instance_info.txt"
