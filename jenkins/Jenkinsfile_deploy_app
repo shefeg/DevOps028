@@ -33,9 +33,8 @@ pipeline {
 			parallel {
 		        stage('Create EC2') {
 					steps {
-						sh "/usr/bin/aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 | tee instance_info.txt"
-						sh "/usr/bin/aws ec2 create-tags --resources `grep \"InstanceId\" instance_info.txt | cut -d':' -f2 | tr -d '\", '` --tags Key=Name,Value=${params.INSTANCE_NAME}"
-						sh "while [[  `/usr/bin/aws ec2 describe-instances --filters \"Name=tag-value,Values=${params.INSTANCE_NAME}\" | grep \"16\" | grep \"Code\" | cut -d':' -f2 | tr -d '\", '` != \"16\"  ]]; do sleep 10; done"
+						sh "aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 | tee instance_info.txt"
+						sh "aws ec2 create-tags --resources `grep \"InstanceId\" instance_info.txt | cut -d':' -f2 | tr -d '\", '` --tags Key=Name,Value=${params.INSTANCE_NAME}"
 					}
 				}
 		        stage('Build application') {
@@ -60,18 +59,21 @@ pipeline {
 		}
 		stage('Populate S3 bucket') {
 			steps {
-				sh "/usr/bin/aws s3api create-bucket --bucket ${params.INSTANCE_NAME} --region ${params.REGION}"
+				sh "aws s3api create-bucket --bucket ${params.INSTANCE_NAME} --region ${params.REGION}"
 				sh "wget https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3.5.3/liquibase-3.5.3-bin.tar.gz"
 				sh "wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar"
-				sh "/usr/bin/aws s3 cp target/Samsara-1.3.5.RELEASE.jar	s3://${params.INSTANCE_NAME}/Samsara-1.3.5.RELEASE.jar"
-				sh "/usr/bin/aws s3 cp liquibase-3.5.3-bin.tar.gz	s3://${params.INSTANCE_NAME}/liquibase-3.5.3-bin.tar.gz"
-				sh "/usr/bin/aws s3 cp postgresql-42.1.4.jar s3://${params.INSTANCE_NAME}/postgresql-42.1.4.jar"
+				sh "aws s3 cp target/Samsara-1.3.5.RELEASE.jar	s3://${params.INSTANCE_NAME}/Samsara-1.3.5.RELEASE.jar"
+				sh "aws s3 cp liquibase-3.5.3-bin.tar.gz	s3://${params.INSTANCE_NAME}/liquibase-3.5.3-bin.tar.gz"
+				sh "aws s3 cp postgresql-42.1.4.jar s3://${params.INSTANCE_NAME}/postgresql-42.1.4.jar"
             }
 		}
 		stage ('Configure environment on EC2 and deploy Application') {
 		    steps {
-		        sh "while ! ssh -o StrictHostKeyChecking=no -i /usr/aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1`; do echo \"SSH failed, retrying...\" >&2 && sleep 5;done;"
-		        sh "ssh -o StrictHostKeyChecking=no -i /usr/aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1` 'sudo apt-get update; sudo apt-get install git; git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git; chmod +x /home/ubuntu/DevOps028/jenkins/init.sh /home/ubuntu/DevOps028/provision/main.yml; /home/ubuntu/DevOps028/jenkins/init.sh; ansible-playbook /home/ubuntu/DevOps028/provision/main.yml'"
+		        sh "chmod +x ${WORKSPACE}/jenkins/prepare_key.sh && ${WORKSPACE}/jenkins/prepare_key.sh"
+		        timeout(time: 120, unit: 'SECONDS') {
+                    sh "while ! ssh -o StrictHostKeyChecking=no -i aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1`; do echo \"SSH failed, retrying...\" >&2 && sleep 5;done;"
+                }
+		        sh "ssh -o StrictHostKeyChecking=no -i aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1` 'sudo apt-get update; sudo apt-get install git; git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git; chmod +x /home/ubuntu/DevOps028/jenkins/init.sh /home/ubuntu/DevOps028/provision/main.yml; /home/ubuntu/DevOps028/jenkins/init.sh; ansible-playbook /home/ubuntu/DevOps028/provision/main.yml'"
 	        }
 		}
 	}
