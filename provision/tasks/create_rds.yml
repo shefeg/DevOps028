@@ -70,7 +70,7 @@
 #     - $DB_PASSWORD
 
  - name: Check if RDS instance is available.
-   shell: "while [[  `/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"available\" | grep \"DBInstanceStatus\" | cut -d':' -f2 | tr -d '\", '` != \"available\"  ]]; do sleep 10; done"
+   shell: "while [[  `/usr/bin/aws rds describe-db-instances --db-instance-identifier {{ rds.rds_instance_name }} | grep \"available\" | grep \"DBInstanceStatus\" | cut -d':' -f2 | tr -d '\", '` != \"available\"  ]]; do sleep 10; done"
    register: rds_available
 
  - debug: msg="RDS is available"
