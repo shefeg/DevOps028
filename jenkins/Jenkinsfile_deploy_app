@@ -2,7 +2,6 @@ pipeline {
 
     agent {
         label 'slave_2'
-
     }
 
     tools {
@@ -13,25 +12,41 @@ pipeline {
         string(name: 'MAVEN_OPTS', defaultValue: '-Djava.awt.headless=true', description: 'Options for Maven')
         string(name: 'REGION', defaultValue: 'us-east-1')
         string(name: 'INSTANCE_NAME', defaultValue: 'aidemo2')
+        string(name: 'EC2_AMI', defaultValue: 'ami-7166ab0b')
+        string(name: 'EC2_INSTANCE_TYPE', defaultValue: 't2.micro')
+        string(name: 'SSH_KEYS', defaultValue: 'aipk')
+		string(name: 'SECURITY_GROUP', defaultValue: 'ec2')
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout(
-                    [$class: 'GitSCM', 
-                    branches: [[name: '*/jenkins']], doGenerateSubmoduleConfigurations: false, 
-                    extensions: [[$class: 'CleanBeforeCheckout']], submoduleCfg: [], 
-                    userRemoteConfigs: [[url: 'https://github.com/shefeg/DevOps028.git']]])
+                    [$class: 'GitSCM',
+                    branches: [[name: '*/jenkins']], doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout']], submoduleCfg: [],
+                    userRemoteConfigs: [[url: 'https://github.com/shefeg/DevOps028.git']]]
+                )
             }
         }
-		stage('Build') {
-			steps {
-				echo 'Compiling Project...'
-				sh "mvn -B dependency:resolve ${params.MAVEN_OPTS}"
-				sh "mvn clean compile -B ${params.MAVEN_OPTS}"
+        stage('Create EC2 and Build application') {
+			parallel {
+		        stage('Create EC2') {
+					steps {
+						sh "/usr/bin/aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 | tee instance_info.txt"
+						sh "/usr/bin/aws ec2 create-tags --resources `grep \"InstanceId\" instance_info.txt | cut -d':' -f2 | tr -d '\", '` --tags Key=Name,Value=${params.INSTANCE_NAME}"
+						sh "while [[  `/usr/bin/aws ec2 describe-instances --filters \"Name=tag-value,Values=${params.INSTANCE_NAME}\" | grep \"16\" | grep \"Code\" | cut -d':' -f2 | tr -d '\", '` != \"16\"  ]]; do sleep 10; done"
+					}
+				}
+		        stage('Build application') {
+			        steps {
+				        echo 'Compiling Project...'
+				        sh "mvn -B dependency:resolve ${params.MAVEN_OPTS}"
+				        sh "mvn clean compile -B ${params.MAVEN_OPTS}"
+			        }
+		        }
 			}
-		}
+        }
 		stage('Test and Package') {
 			steps {
 				echo 'Testing and Packaging Project..'
@@ -52,6 +67,12 @@ pipeline {
 				sh "/usr/bin/aws s3 cp liquibase-3.5.3-bin.tar.gz	s3://${params.INSTANCE_NAME}/liquibase-3.5.3-bin.tar.gz"
 				sh "/usr/bin/aws s3 cp postgresql-42.1.4.jar s3://${params.INSTANCE_NAME}/postgresql-42.1.4.jar"
             }
+		}
+		stage ('Configure environment on EC2 and deploy Application') {
+		    steps {
+		        sh "while ! ssh -o StrictHostKeyChecking=no -i /usr/aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1`; do echo \"SSH failed, retrying...\" >&2 && sleep 5;done;"
+		        sh "ssh -o StrictHostKeyChecking=no -i /usr/aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1` 'sudo apt-get update; sudo apt-get install git; git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git; chmod +x /home/ubuntu/DevOps028/jenkins/init.sh /home/ubuntu/DevOps028/provision/main.yml; /home/ubuntu/DevOps028/jenkins/init.sh; ansible-playbook /home/ubuntu/DevOps028/provision/main.yml'"
+	        }
 		}
 	}
 }

@@ -16,11 +16,11 @@ pipeline {
                             string(name: 'RDS_BACKUP_RETENTION', value: '0'),
                             string(name: 'DB_NAME', value: 'auradb'),
                             string(name: 'DB_USER', value: 'aura'),
+                            string(name: 'DB_PASSWORD', value: 'mysecretpassword'),
                             string(name: 'EC2_AMI', value: 'ami-c425e5be'),
                             string(name: 'EC2_INSTANCE_TYPE', value: 't2.micro'),
                             string(name: 'SSH_KEYS', value: 'aipk'),
                             string(name: 'SECURITY_GROUP', value: 'ec2'),
-                            string(name: 'DB_PASSWORD', defaultValue: 'mysecretpassword')
                         ]
                     },
                     build_application: {

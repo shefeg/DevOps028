@@ -42,7 +42,7 @@ echo "---Installing build pre-requisites for Ansible:---"
 sleep 2
 if [[ $(os_type) == *"debian"* ]];
     then
-        sudo apt-get install build-essential libssl-dev libffi-dev python-dev zip git -y
+        sudo apt-get install build-essential libssl-dev libffi-dev python-dev zip unzip git -y
     else
         yum install build-essential libssl-dev libffi-dev python-dev -y
 fi
