@@ -1,8 +1,9 @@
 pipeline {
+
     agent { label 'master' }
+
     stages {
         stage('Prepare Environment and Build Application') {
-            agent { label 'master' }
             steps {
                 parallel (
                     prepare_environment: {
@@ -34,5 +35,25 @@ pipeline {
                 )
             }
         }
+        stage('Delete not busy Slaves') {
+            steps {
+                script {
+                    for (aSlave in hudson.model.Hudson.instance.slaves) {
+                        println('====================');
+                        println('Name: ' + aSlave.name);
+                        println('getLabelString: ' + aSlave.getLabelString());
+                        println('\tcomputer.isOffline: ' + aSlave.getComputer().isOffline());
+                        println('\tcomputer.countBusy: ' + aSlave.getComputer().countBusy());
+                        if ((aSlave.getLabelString() == 'slave_1' && aSlave.getComputer().countBusy() == 0) || (aSlave.getLabelString() == 'slave_2' && aSlave.getComputer().countBusy() == 0)) {
+                            println('Shutting down slave!!!!');
+                            aSlave.getComputer().setTemporarilyOffline(true,null);
+                            aSlave.getComputer().doDoDelete();
+                        } else {
+                            println('Slave is busy!');
+                        }
+                    }
+                }
+            }
+		}
     }
 }
