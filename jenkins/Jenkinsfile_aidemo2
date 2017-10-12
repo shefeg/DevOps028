@@ -29,7 +29,11 @@ pipeline {
                         parameters: [
                             string(name: 'MAVEN_OPTS', value: '-Djava.awt.headless=true'),
                             string(name: 'REGION', value: 'us-east-1'),
-                            string(name: 'INSTANCE_NAME', value: 'aidemo2')
+                            string(name: 'INSTANCE_NAME', value: 'aidemo2'),
+                            string(name: 'EC2_AMI', value: 'ami-7166ab0b'),
+                            string(name: 'EC2_INSTANCE_TYPE', value: 't2.micro'),
+                            string(name: 'SSH_KEYS', value: 'aipk'),
+		                    string(name: 'SECURITY_GROUP', value: 'ec2')
                         ]
                     }
                 )

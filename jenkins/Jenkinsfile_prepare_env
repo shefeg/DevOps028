@@ -19,6 +19,6 @@ node ('slave_1') {
 		} catch (err) {
 		    echo "Caught: ${err}"
             currentBuild.result = 'SUCCESS'
-          }
+        }
     }
 }
