@@ -18,7 +18,10 @@ node ('slave_1') {
 			sh "echo DB_HOST=`/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"Address\" | cut -d':' -f2 | tr -d '\", '`"
 		} catch (err) {
 		    echo "Caught: ${err}"
+		  if (err.getMessage().contains('255')) {
             currentBuild.result = 'SUCCESS'
+		  }
+
         }
     }
 }

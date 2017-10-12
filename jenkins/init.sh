@@ -95,7 +95,6 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
                     sleep 2
                     sudo pip install ansible
                     sudo mkdir /etc/ansible
-                    sudo cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
                     sudo pip install boto
                     sudo pip install boto3
                 else
@@ -109,3 +108,8 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
 }
 
 ansible_checker
+
+cd /home/ubuntu/
+sudo git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git
+cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
+ansible-playbook DevOps028/provision/main.yml
