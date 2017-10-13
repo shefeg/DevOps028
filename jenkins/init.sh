@@ -110,6 +110,6 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
 ansible_checker
 
 cd /home/ubuntu/
-sudo git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git
-cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
+git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git
+sudo cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
 ansible-playbook DevOps028/provision/main.yml

@@ -29,19 +29,20 @@ pipeline {
                 )
             }
         }
-        stage('Create EC2 and Build application') {
+
+        stage('Trigger creating of new EC2 instance and Build application') {
 			parallel {
 		        stage('Terminate old EC2 instances') {
 					steps {
-						build job: 'terminate_ec2', parameters: [string(name: 'INSTANCE_NAME', value: '${params.INSTANCE_NAME}')]
+						build job: 'terminate_ec2', parameters: [string(name: 'INSTANCE_NAME', value: 'aidemo2')]
 					}
 				}
-		        stage('Create EC2') {
+/*		        stage('Create EC2') {
 					steps {
 						sh "aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 | tee instance_info.txt"
 						sh "aws ec2 create-tags --resources `grep \"InstanceId\" instance_info.txt | cut -d':' -f2 | tr -d '\", '` --tags Key=Name,Value=${params.INSTANCE_NAME}"
 					}
-				}
+				}*/
 		        stage('Build application') {
 			        steps {
 				        echo 'Compiling Project...'
@@ -67,12 +68,24 @@ pipeline {
 				sh "aws s3api create-bucket --bucket ${params.INSTANCE_NAME} --region ${params.REGION}"
 				sh "wget https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3.5.3/liquibase-3.5.3-bin.tar.gz"
 				sh "wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar"
-				sh "aws s3 cp target/Samsara-1.3.5.RELEASE.jar	s3://${params.INSTANCE_NAME}/Samsara-1.3.5.RELEASE.jar"
-				sh "aws s3 cp liquibase-3.5.3-bin.tar.gz	s3://${params.INSTANCE_NAME}/liquibase-3.5.3-bin.tar.gz"
+				sh "aws s3 cp target/Samsara-1.3.5.RELEASE.jar s3://${params.INSTANCE_NAME}/Samsara-1.3.5.RELEASE.jar"
+				sh "aws s3 cp liquibase-3.5.3-bin.tar.gz s3://${params.INSTANCE_NAME}/liquibase-3.5.3-bin.tar.gz"
 				sh "aws s3 cp postgresql-42.1.4.jar s3://${params.INSTANCE_NAME}/postgresql-42.1.4.jar"
             }
 		}
-		stage ('Configure environment on EC2 and deploy Application') {
+		stage ('Wait for application to deploy on EC2') {
+		    steps {
+		    sleep time: 3, unit: 'MINUTES'
+		    }
+		}
+		stage ('Check if Application is available') {
+		    steps {
+		        timeout(time: 240, unit: 'SECONDS') {
+                    sh "until \$(curl -sSf http://`aws ec2 describe-instances --filters \"Name=tag:Name,Values=${params.INSTANCE_NAME}\" | grep \"PublicIp\" | cut -d':' -f2 | tr -d '\", ' | tail -n1`:9000/login > /dev/null); do sleep 5; done"
+                }
+	        }
+		}
+/*		stage ('Configure environment on EC2 and deploy Application') {
 		    steps {
 		        sh "chmod +x ${WORKSPACE}/jenkins/prepare_key.sh && ${WORKSPACE}/jenkins/prepare_key.sh"
 		        timeout(time: 120, unit: 'SECONDS') {
@@ -80,6 +93,6 @@ pipeline {
                 }
 		        sh "ssh -o StrictHostKeyChecking=no -i aipk.pem ubuntu@`grep \"PrivateIp\" instance_info.txt | cut -d':' -f2 | tr -d '\", ' | tail -n1` 'sudo apt-get update; sudo apt-get install git; git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git; chmod +x /home/ubuntu/DevOps028/jenkins/init.sh /home/ubuntu/DevOps028/provision/main.yml; /home/ubuntu/DevOps028/jenkins/init.sh; ansible-playbook /home/ubuntu/DevOps028/provision/main.yml'"
 	        }
-		}
+		}*/
 	}
 }

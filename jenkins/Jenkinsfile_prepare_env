@@ -21,7 +21,6 @@ node ('slave_1') {
 		  if (err.getMessage().contains('255')) {
             currentBuild.result = 'SUCCESS'
 		  }
-
         }
     }
 }
