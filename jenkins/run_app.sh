@@ -15,7 +15,7 @@ wget https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3
 wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar -P liquibase
 
 #Untar Liquibase tool and run it
-tar -xf liquibase-3.5.3-bin.tar.gz -C liquibase
+tar -xf liquibase/liquibase-3.5.3-bin.tar.gz -C liquibase
 liquibase/liquibase --defaultsFile=liquibase/liquibase.properties --changeLogFile=liquibase/changelogs/changelog-main.xml --classpath=liquibase/postgresql-42.1.4.jar update
 
 #Run application
