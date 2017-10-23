@@ -1,0 +1,66 @@
+pipeline {
+
+    agent {
+        label 'slave_2'
+    }
+
+    tools {
+        maven "M3"
+    }
+
+    parameters {
+        string(name: 'MAVEN_OPTS', defaultValue: '-Djava.awt.headless=true', description: 'Options for Maven')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout(
+                    [$class: 'GitSCM',
+                    branches: [[name: '*/jenkins']], doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout']], submoduleCfg: [],
+                    userRemoteConfigs: [[url: 'https://github.com/shefeg/DevOps028.git']]]
+                )
+            }
+        }
+
+        stage('Build application') {
+	        steps {
+		        echo 'Compiling Project...'
+		        sh "mvn -B dependency:resolve ${params.MAVEN_OPTS}"
+		        sh "mvn clean compile -B ${params.MAVEN_OPTS}"
+	        }
+        }
+
+		stage('Test and Package') {
+			steps {
+				echo 'Testing and Packaging Project..'
+				sh "mvn package -B ${params.MAVEN_OPTS}"
+			}
+		}
+		stage('Create Artifact') {
+			steps {
+			    archive 'target/*.jar'
+			}
+		}
+
+		stage('Build image with Samsara') {
+			steps {
+				script {
+					docker.build("samsara")
+				}
+			}
+		}
+
+		stage('Push image to AWS ECR') {
+			steps {
+				script {
+					docker.withRegistry("https://455022533484.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:0ac74b53-e568-4b1a-bb1e-c125eda20097") {
+						docker.image("samsara").push()
+					}
+				}
+			}
+		}
+
+	}
+}
