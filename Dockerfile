@@ -11,7 +11,7 @@ COPY liquibase ./liquibase
 ENV DB_HOST=aidemo2.cxrpxm1cr8gt.us-east-1.rds.amazonaws.com
 ENV DB_NAME=auradb
 ENV DB_USER=aura
-ENV DB_PASSWORD=mysecretpassword
+ENV DB_PASS=mysecretpassword
 
 ENTRYPOINT ["bash", "/samsara/run_app.sh"]
 
