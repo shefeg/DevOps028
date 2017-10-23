@@ -4,7 +4,7 @@
 cat > liquibase/liquibase.properties << EOF
 driver: org.postgresql.Driver
 url: jdbc:postgresql://$DB_HOST:5432/$DB_NAME
-username: $DB_NAME
+username: $DB_USER
 password: $DB_PASSWORD
 # specifies packages where entities are and database dialect, used for liquibase:diff command
 referenceUrl=hibernate:spring:academy.softserve.aura.core.entity?dialect=org.hibernate.dialect.PostgreSQL9Dialect
