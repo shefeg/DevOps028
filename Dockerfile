@@ -1,12 +1,12 @@
 FROM openjdk:8
 
-RUN mkdir -p /samsara
+RUN mkdir -p /samsara/liquibase
 
 WORKDIR /samsara
 
 COPY jenkins/populate_db.sh .
 COPY target/Samsara-1.3.5.RELEASE.jar .
-COPY liquibase .
+COPY liquibase ./liquibase
 
 ENV DB_HOST=aidemo2.cxrpxm1cr8gt.us-east-1.rds.amazonaws.com \
     DB_NAME=auradb \
