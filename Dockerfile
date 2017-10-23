@@ -1,8 +1,8 @@
 FROM openjdk:8
 
-RUN mkdir /var/lib/jenkins/samsara
+RUN mkdir -p /samsara
 
-WORKDIR /var/lib/jenkins/samsara
+WORKDIR /samsara
 
 COPY jenkins/populate_db.sh .
 COPY target/Samsara-1.3.5.RELEASE.jar .
@@ -13,6 +13,6 @@ ENV DB_HOST=aidemo2.cxrpxm1cr8gt.us-east-1.rds.amazonaws.com \
     DB_USER=aura \
     DB_PASS=mysecretpassword
 
-ENTRYPOINT ["bash", "/var/lib/jenkins/samsara/populate_db.sh"]
+ENTRYPOINT ["bash", "/samsara/populate_db.sh"]
 
 EXPOSE 9000

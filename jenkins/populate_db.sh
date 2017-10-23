@@ -17,4 +17,4 @@ wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar -o liquibase/pos
 #Untar Liquibase tool and run it
 tar -xf liquibase/liquibase-3.5.3-bin.tar.gz
 liquibase/liquibase --defaultsFile=liquibase/liquibase.properties --changeLogFile=liquibase/changelogs/changelog-main.xml --classpath=liquibase/postgresql-42.1.4.jar update
-java -jar /var/lib/jenkins/samsara/Samsara-1.3.5.RELEASE.jar
+java -jar /samsara/Samsara-1.3.5.RELEASE.jar
