@@ -11,10 +11,10 @@ referenceUrl=hibernate:spring:academy.softserve.aura.core.entity?dialect=org.hib
 EOF
 
 #Download liquibase tool and postgresql jdbc driver
-wget https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3.5.3/liquibase-3.5.3-bin.tar.gz -o liquibase/liquibase-3.5.3-bin.tar.gz
-wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar -o liquibase/postgresql-42.1.4.jar
+wget https://github.com/liquibase/liquibase/releases/download/liquibase-parent-3.5.3/liquibase-3.5.3-bin.tar.gz
+wget https://jdbc.postgresql.org/download/postgresql-42.1.4.jar
 
 #Untar Liquibase tool and run it
-tar -xf liquibase/liquibase-3.5.3-bin.tar.gz
-liquibase/liquibase --defaultsFile=liquibase/liquibase.properties --changeLogFile=liquibase/changelogs/changelog-main.xml --classpath=liquibase/postgresql-42.1.4.jar update
+tar -xf liquibase-3.5.3-bin.tar.gz
+liquibase --defaultsFile=liquibase/liquibase.properties --changeLogFile=liquibase/changelogs/changelog-main.xml --classpath=postgresql-42.1.4.jar update
 java -jar /samsara/Samsara-1.3.5.RELEASE.jar
