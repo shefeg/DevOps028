@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/postgresdb:latest
-        name: postgres
+        name: postgresdb
         ports:
         - containerPort: 5432
-          name: postgresdb
+          name: postgresdbdb
