@@ -3,35 +3,36 @@ kind: Service
 metadata:
   name: samsara
   labels:
-    app: samsara
+    service: samsara
 spec:
   ports:
     - port: 9000
+      targetPort: 9000
   selector:
-    app: samsara
+    service: samsara
   type: LoadBalancer
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: samsara-deployment
   labels:
-    app: samsara
+    service: samsara
+  name: samsara-deployment
 spec:
   selector:
     matchLabels:
-      app: samsara
+      service: samsara
   template:
     metadata:
       labels:
-        app: samsara
+        service: samsara
     spec:
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/samsara:latest
         name: samsara
         env:
         - name: DB_HOST
-          value: postgresdb
+          value: "postgresdb.default.svc.cluster.local"
         - name: DB_NAME
           value: auradb
         - name: DB_USER
@@ -40,4 +41,5 @@ spec:
           value: mysecretpassword
         ports:
         - containerPort: 9000
-          name: samsara
+          protocol: TCP
+          name: samsara-port

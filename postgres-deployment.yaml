@@ -3,34 +3,37 @@ kind: Service
 metadata:
   name: postgresdb
   labels:
-    app: samsara
+    service: postgresdb
 spec:
+  type: NodePort
   ports:
-    - port: 5432
+  - port: 5432
+    nodePort: 32001
+    targetPort: 5432
   selector:
-    app: samsara
-  clusterIP: None
+    service: postgresdb
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: postgresdb
   labels:
-    app: samsara
+    service: postgresdb
+  name: postgresdb-deployment
 spec:
   selector:
     matchLabels:
-      app: samsara
+      service: postgresdb
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: samsara
+        service: postgresdb
     spec:
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/postgresdb:latest
         name: postgresdb
         ports:
         - containerPort: 5432
-          name: postgresdbdb
+          name: postgresdb-port
+          protocol: TCP
