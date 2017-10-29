@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgresdb
+spec:
+  containers:
+  - name: postgresdb
+    image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/postgresdb:latest
+    ports:
+    - containerPort: 5432

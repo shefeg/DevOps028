@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: samsara
+  labels:
+    app: samsara
+spec:
+  ports:
+    - port: 9000
+  selector:
+    app: samsara
+  type: LoadBalancer
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: samsara-deployment
+  labels:
+    app: samsara
+spec:
+  selector:
+    matchLabels:
+      app: samsara
+  template:
+    metadata:
+      labels:
+        app: samsara
+    spec:
+      containers:
+      - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/samsara:latest
+        name: samsara
+        env:
+        - name: DB_HOST
+          value: db
+        - name: DB_NAME
+          value: auradb
+        - name: DB_USER
+          value: aura
+        - name: DB_PASS
+          value: mysecretpassword
+        ports:
+        - containerPort: 9000
+          name: samsara
