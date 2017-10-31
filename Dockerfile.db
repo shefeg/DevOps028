@@ -8,7 +8,7 @@ RUN groupadd -r postgres --gid=999 && useradd -r -g postgres --uid=999 postgres
 
 RUN apt-get update && apt-get install -y python-software-properties software-properties-common postgresql-9.3 postgresql-client-9.3 postgresql-contrib-9.3
 
-RUN mkdir -p "/var/lib/postgresql/9.3/main" && chown -R postgres:postgres "/var/lib/postgresql/9.3/main" && chmod 700 "/var/lib/postgresql/9.3/main"
+RUN mkdir -p "/var/lib/postgresql/9.3/main" && chown -R postgres:postgres "/var/lib/postgresql/9.3/main" && chmod 0700 "/var/lib/postgresql/9.3/main"
 
 USER postgres
 
