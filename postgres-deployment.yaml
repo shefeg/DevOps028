@@ -13,6 +13,19 @@ spec:
   selector:
     service: postgresdb
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pv-claim
+  labels:
+    service: postgresdb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -30,6 +43,9 @@ spec:
       labels:
         service: postgresdb
     spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/postgresdb:latest
         name: postgresdb
@@ -37,3 +53,10 @@ spec:
         - containerPort: 5432
           name: postgresdb-port
           protocol: TCP
+        volumeMounts:
+          - name: postgresql-persistent-storage
+            mountPath: "/var/lib/postgresql"
+      volumes:
+        - name: postgresql-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
