@@ -46,7 +46,7 @@ pipeline {
 			}
 		}
 
-		stage('Build and push Samsara ans Postgres images to AWS ECR') {
+		stage('Build and push Samsara and Postgres images to AWS ECR') {
 			steps {
 				script {
 				    app = docker.build("samsara", "-f Dockerfile.app .")
@@ -66,11 +66,19 @@ pipeline {
 			}
 		}
 
-		stage ('Wait for application to restore on cluster') {
+		stage('Apply updates to Kubernetes cluster when ready') {
+			steps {
+                sh "while [ 1 ]; do kops validate cluster --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} && break || sleep 30; done"
+                sh "kubectl apply -f postgres-deployment.yaml && sleep 30"
+                sh "kubectl apply -f samsara-deployment.yaml"
+			}
+		}
+
+/*		stage ('Wait for application to restore on cluster') {
 		    steps {
 		    sleep time: 5, unit: 'MINUTES'
 		    }
-		}
+		}*/
 
 		stage('Check if application is reachable on the Loadbalancer') {
 			steps {
