@@ -26,13 +26,32 @@ pipeline {
             }
         }
 
-        stage('Build application') {
+        stage('Trigger restoring Kubernetes cluster and Building application') {
+			parallel {
+		        stage('Restore Kubernetes cluster') {
+			        steps {
+                        sh "kops replace --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} -f kops-full-cluster.yaml"
+                        sh "kops update cluster --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} --yes"
+			        }
+		        }
+
+		        stage('Build application') {
+			        steps {
+				        echo 'Compiling Project...'
+				        sh "mvn -B dependency:resolve ${params.MAVEN_OPTS}"
+				        sh "mvn clean compile -B ${params.MAVEN_OPTS}"
+			        }
+		        }
+			}
+        }
+
+/*        stage('Build application') {
 	        steps {
 		        echo 'Compiling Project...'
 		        sh "mvn -B dependency:resolve ${params.MAVEN_OPTS}"
 		        sh "mvn clean compile -B ${params.MAVEN_OPTS}"
 	        }
-        }
+        }*/
 
 		stage('Test and Package') {
 			steps {
@@ -59,17 +78,10 @@ pipeline {
 			}
 		}
 
-		stage('Restore Kubernetes cluster') {
-			steps {
-                sh "kops replace --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} -f kops-full-cluster.yaml"
-                sh "kops update cluster --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} --yes"
-			}
-		}
-
 		stage('Apply updates to Kubernetes cluster when ready') {
 			steps {
                 sh "while [ 1 ]; do kops validate cluster --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} && break || sleep 30; done"
-                sh "kubectl apply -f postgres-deployment.yaml"
+                sh "kubectl apply -f postgres-deployment.yaml && sleep 10"
                 sh "kubectl apply -f samsara-deployment.yaml"
 			}
 		}
