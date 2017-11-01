@@ -69,16 +69,10 @@ pipeline {
 		stage('Apply updates to Kubernetes cluster when ready') {
 			steps {
                 sh "while [ 1 ]; do kops validate cluster --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} && break || sleep 30; done"
-                sh "kubectl apply -f postgres-deployment.yaml && sleep 30"
+                sh "kubectl apply -f postgres-deployment.yaml"
                 sh "kubectl apply -f samsara-deployment.yaml"
 			}
 		}
-
-/*		stage ('Wait for application to restore on cluster') {
-		    steps {
-		    sleep time: 5, unit: 'MINUTES'
-		    }
-		}*/
 
 		stage('Check if application is reachable on the Loadbalancer') {
 			steps {

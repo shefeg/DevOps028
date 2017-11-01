@@ -37,12 +37,7 @@ pipeline {
 						build job: 'terminate_ec2', parameters: [string(name: 'INSTANCE_NAME', value: 'aidemo2')]
 					}
 				}
-/*		        stage('Create EC2') {
-					steps {
-						sh "aws ec2 run-instances --image-id ${params.EC2_AMI} --count 1 --instance-type ${params.EC2_INSTANCE_TYPE} --key-name ${params.SSH_KEYS} --security-groups ${params.SECURITY_GROUP} 2>&1 | tee instance_info.txt"
-						sh "aws ec2 create-tags --resources `grep \"InstanceId\" instance_info.txt | cut -d':' -f2 | tr -d '\", '` --tags Key=Name,Value=${params.INSTANCE_NAME}"
-					}
-				}*/
+
 		        stage('Build application') {
 			        steps {
 				        echo 'Compiling Project...'
