@@ -18,6 +18,14 @@ metadata:
   labels:
     service: samsara
   name: samsara-deployment
+  annotations:
+    pod.beta.kubernetes.io/init-containers: '[
+        {
+            "name": "init-mydb",
+            "image": "jbergknoff/postgresql-client",
+            "command": ["sh", "-c", "until postgresql://aura:mysecretpassword@postgresdb.default.svc.cluster.local:5432/auradb; do echo waiting for mydb; sleep 2; done;"]
+        }
+    ]'
 spec:
   selector:
     matchLabels:
