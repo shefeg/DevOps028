@@ -45,14 +45,6 @@ pipeline {
 			}
         }
 
-/*        stage('Build application') {
-	        steps {
-		        echo 'Compiling Project...'
-		        sh "mvn -B dependency:resolve ${params.MAVEN_OPTS}"
-		        sh "mvn clean compile -B ${params.MAVEN_OPTS}"
-	        }
-        }*/
-
 		stage('Test and Package') {
 			steps {
 				echo 'Testing and Packaging Project..'
@@ -81,8 +73,8 @@ pipeline {
 		stage('Apply updates to Kubernetes cluster when ready') {
 			steps {
                 sh "while [ 1 ]; do kops validate cluster --name ${KOPS_CLUSTER_NAME} --state=${KOPS_CLUSTER_S3_STATE} && break || sleep 30; done"
-                sh "kubectl apply -f postgres-deployment.yaml && sleep 10"
-                sh "kubectl apply -f samsara-deployment.yaml"
+                sh "kubectl apply -f postgres-deployment.yaml && sleep 15"
+                sh "kubectl apply -f samsara-deployment.yaml && kubectl set image deployment samsara-deployment samsara=455022533484.dkr.ecr.us-east-1.amazonaws.com/samsara --record"
 			}
 		}
 
