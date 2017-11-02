@@ -5,7 +5,6 @@ metadata:
   labels:
     service: samsara
 spec:
-  replicas: 2
   ports:
     - port: 9000
       targetPort: 9000
@@ -20,6 +19,7 @@ metadata:
     service: samsara
   name: samsara-deployment
 spec:
+  replicas: 2
   selector:
     matchLabels:
       service: samsara
