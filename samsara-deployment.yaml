@@ -36,7 +36,6 @@ spec:
     spec:
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/samsara:latest
-        imagePullPolicy: IfNotPresent
         name: samsara
         env:
         - name: DB_HOST
