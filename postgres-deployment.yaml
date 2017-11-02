@@ -55,7 +55,7 @@ spec:
           protocol: TCP
         volumeMounts:
           - name: postgresql-persistent-storage
-            mountPath: "/var/lib/postgresql/"
+            mountPath: "/var/lib/postgresql"
       volumes:
         - name: postgresql-persistent-storage
           persistentVolumeClaim:
