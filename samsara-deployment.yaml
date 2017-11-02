@@ -5,6 +5,7 @@ metadata:
   labels:
     service: samsara
 spec:
+  replicas: 2
   ports:
     - port: 9000
       targetPort: 9000
@@ -22,6 +23,12 @@ spec:
   selector:
     matchLabels:
       service: samsara
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 10
   template:
     metadata:
       labels:
@@ -29,6 +36,7 @@ spec:
     spec:
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/samsara:latest
+        imagePullPolicy: IfNotPresent
         name: samsara
         env:
         - name: DB_HOST
