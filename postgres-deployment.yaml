@@ -8,10 +8,10 @@ spec:
   type: NodePort
   ports:
   - port: 5432
-    nodePort: 32001
     targetPort: 5432
   selector:
     service: postgresdb
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
