@@ -1,8 +1,9 @@
 pipeline {
+
     agent { label 'master' }
+
     stages {
         stage('Prepare Environment and Build Application') {
-            agent { label 'master' }
             steps {
                 parallel (
                     prepare_environment: {
@@ -16,11 +17,11 @@ pipeline {
                             string(name: 'RDS_BACKUP_RETENTION', value: '0'),
                             string(name: 'DB_NAME', value: 'auradb'),
                             string(name: 'DB_USER', value: 'aura'),
+                            string(name: 'DB_PASSWORD', value: 'mysecretpassword'),
                             string(name: 'EC2_AMI', value: 'ami-c425e5be'),
                             string(name: 'EC2_INSTANCE_TYPE', value: 't2.micro'),
                             string(name: 'SSH_KEYS', value: 'aipk'),
                             string(name: 'SECURITY_GROUP', value: 'ec2'),
-                            string(name: 'DB_PASSWORD', defaultValue: 'mysecretpassword')
                         ]
                     },
                     build_application: {
@@ -28,11 +29,35 @@ pipeline {
                         parameters: [
                             string(name: 'MAVEN_OPTS', value: '-Djava.awt.headless=true'),
                             string(name: 'REGION', value: 'us-east-1'),
-                            string(name: 'INSTANCE_NAME', value: 'aidemo2')
+                            string(name: 'INSTANCE_NAME', value: 'aidemo2'),
+                            string(name: 'EC2_AMI', value: 'ami-7166ab0b'),
+                            string(name: 'EC2_INSTANCE_TYPE', value: 't2.micro'),
+                            string(name: 'SSH_KEYS', value: 'aipk'),
+		                    string(name: 'SECURITY_GROUP', value: 'ec2')
                         ]
                     }
                 )
             }
         }
+        stage('Delete not busy Slaves') {
+            steps {
+                script {
+                    for (aSlave in hudson.model.Hudson.instance.slaves) {
+                        println('====================');
+                        println('Name: ' + aSlave.name);
+                        println('getLabelString: ' + aSlave.getLabelString());
+                        println('\tcomputer.isOffline: ' + aSlave.getComputer().isOffline());
+                        println('\tcomputer.countBusy: ' + aSlave.getComputer().countBusy());
+                        if ((aSlave.getLabelString() == 'slave_1' && aSlave.getComputer().countBusy() == 0) || (aSlave.getLabelString() == 'slave_2' && aSlave.getComputer().countBusy() == 0)) {
+                            println('Shutting down slave!!!!');
+                            aSlave.getComputer().setTemporarilyOffline(true,null);
+                            aSlave.getComputer().doDoDelete();
+                        } else {
+                            println('Slave is busy!');
+                        }
+                    }
+                }
+            }
+		}
     }
 }

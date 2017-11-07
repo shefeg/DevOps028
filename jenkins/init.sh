@@ -42,7 +42,7 @@ echo "---Installing build pre-requisites for Ansible:---"
 sleep 2
 if [[ $(os_type) == *"debian"* ]];
     then
-        sudo apt-get install build-essential libssl-dev libffi-dev python-dev zip git -y
+        sudo apt-get install build-essential libssl-dev libffi-dev python-dev zip unzip git -y
     else
         yum install build-essential libssl-dev libffi-dev python-dev -y
 fi
@@ -95,7 +95,6 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
                     sleep 2
                     sudo pip install ansible
                     sudo mkdir /etc/ansible
-                    sudo cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
                     sudo pip install boto
                     sudo pip install boto3
                 else
@@ -109,3 +108,8 @@ function ansible_checker { #checks if Ansible is installed, if not - tries to in
 }
 
 ansible_checker
+
+cd /home/ubuntu/
+git clone -b jenkins --single-branch https://github.com/shefeg/DevOps028.git
+sudo cp /home/ubuntu/DevOps028/provision/hosts /etc/ansible/hosts
+ansible-playbook DevOps028/provision/main.yml

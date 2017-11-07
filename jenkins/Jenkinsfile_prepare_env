@@ -1,5 +1,3 @@
-    
-
 node ('slave_1') {
         
     parameters {
@@ -15,12 +13,14 @@ node ('slave_1') {
     }
     stage('Create RDS') {
 		try {    
-		    sh "/usr/bin/aws rds create-db-instance --db-instance-identifier ${params.INSTANCE_NAME} --engine ${params.RDS_DB_ENGINE} --allocated-storage ${params.RDS_SIZE} --db-instance-class ${params.RDS_INSTANCE_TYPE} --db-name ${params.DB_NAME} --master-username ${params.DB_USER} --master-user-password ${params.DB_PASSWORD} --availability-zone ${params.AVAILABILITY_ZONE} --backup-retention-period ${params.RDS_BACKUP_RETENTION}"
-			sh "while [[  `/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"available\" | grep \"DBInstanceStatus\" | cut -d':' -f2 | tr -d '\", '` != \"available\"  ]]; do sleep 10; done"
+		    sh "aws rds create-db-instance --db-instance-identifier ${params.INSTANCE_NAME} --engine ${params.RDS_DB_ENGINE} --allocated-storage ${params.RDS_SIZE} --db-instance-class ${params.RDS_INSTANCE_TYPE} --db-name ${params.DB_NAME} --master-username ${params.DB_USER} --master-user-password ${params.DB_PASSWORD} --availability-zone ${params.AVAILABILITY_ZONE} --backup-retention-period ${params.RDS_BACKUP_RETENTION}"
+			sh "while [[  `/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"DBInstanceStatus\" | cut -d':' -f2 | tr -d '\", '` != \"available\"  ]]; do sleep 10; done"
 			sh "echo DB_HOST=`/usr/bin/aws rds describe-db-instances --db-instance-identifier ${params.INSTANCE_NAME} | grep \"Address\" | cut -d':' -f2 | tr -d '\", '`"
 		} catch (err) {
 		    echo "Caught: ${err}"
+		  if (err.getMessage().contains('255')) {
             currentBuild.result = 'SUCCESS'
-          }
+		  }
+        }
     }
 }
