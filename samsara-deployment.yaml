@@ -38,15 +38,17 @@ spec:
         - name: init-mydb
           image: postgres:9.3
           env:
+          - name: PGHOST
+            value: "52.90.26.189"
           - name: PGPORT
-            value: "5432"
+            value: "32001"
           - name: PGDATABASE
             value: auradb
           - name: PGUSER
             value: aura
           - name: PGPASSWORD
             value: mysecretpassword
-          command: ['/bin/bash', '-c', 'export PGHOST= && while [ 1 ]; do psql && break || sleep 5; done']
+          command: ['/bin/bash', '-c', 'while [ 1 ]; do psql && break || sleep 5; done']
       containers:
       - image: 455022533484.dkr.ecr.us-east-1.amazonaws.com/samsara:latest
 #        imagePullPolicy: Always
