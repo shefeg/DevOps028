@@ -8,7 +8,7 @@ RUN mkdir -p /samsara/liquibase
 
 WORKDIR /samsara
 
-COPY jenkins/run_app.sh .
+COPY run_app.sh .
 COPY --from=builder /usr/src/app/target/Samsara-1.3.5.RELEASE.jar .
 COPY liquibase ./liquibase
 
